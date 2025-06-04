@@ -98,7 +98,7 @@
                          </li>
                      </ul>
                  </li>
-                 <li class="menu-title"><span>CRM</span></li>
+                 {{-- <li class="menu-title"><span>CRM</span></li>
                  <li>
                      <ul>
                          <li class="{{ Request::is('activity') ? 'active' : '' }}">
@@ -107,7 +107,7 @@
                              </a>
                          </li>
                      </ul>
-                 </li>
+                 </li> --}}
                  <li class="menu-title"><span>EVENEMENTS</span></li>
                  <li>
                      <ul>
@@ -138,7 +138,7 @@
                          </li>
                      </ul>
                  </li>
-                 <li class="menu-title"><span>ADMINISTRATION</span></li>
+                 {{-- <li class="menu-title"><span>ADMINISTRATION</span></li>
                  <li>
                      <ul>
                          <li class="submenu">
@@ -239,7 +239,7 @@
                              </ul>
                          </li>
                      </ul>
-                 </li>
+                 </li> --}}
              </ul>
          </div>
      </div>

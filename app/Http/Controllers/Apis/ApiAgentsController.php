@@ -7,6 +7,7 @@ use App\Models\Agents;
 use App\Models\Associations;
 use App\Models\Tickets;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
@@ -93,8 +94,9 @@ class ApiAgentsController extends Controller
     {
         $events = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
             ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
+            ->leftJoin('portes', 'associations.port_id', '=', 'portes.porte_id')
             ->where('associations.agence_id', '=', $id)
-            ->where('tickets.ticket_status', '=', 'ACTIVE') // filtre sur ticket active
+            ->where('tickets.ticket_status', '=', 'Active')
             ->select(
                 'events.event_id',
                 'events.event_image',
@@ -102,39 +104,33 @@ class ApiAgentsController extends Controller
                 'events.event_lieu',
                 'events.event_date',
                 'events.event_time',
-                'tickets.ticket_id',
-                'tickets.ticket_code',
-                'tickets.ticket_st',
-                'tickets.ticket_free',
-                'tickets.ticket_seas',
-                'tickets.ticket_passed',
-                'tickets.ticket_status'
+                'portes.porte_name',
+                DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
+                DB::raw("SUM(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 ELSE 0 END) as tickets_scannes")
+            )
+            ->groupBy(
+                'events.event_id',
+                'events.event_image',
+                'events.event_name',
+                'events.event_lieu',
+                'events.event_date',
+                'events.event_time',
+                'portes.porte_name'
             )
             ->get()
-            ->groupBy('event_id')
-            ->map(function ($group) {
-                $first = $group->first();
+            ->map(function ($event) {
                 return [
-                    'event_id'     => $first->event_id,
-                    'event_image'  => $first->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $first->event_image,
-                    'event_name'   => $first->event_name,
-                    'event_lieu'   => $first->event_lieu,
-                    'event_date'   => $first->event_date,
-                    'event_time'   => $first->event_time,
-                    'tickets'      => $group->map(function ($item) {
-                        return [
-                            'ticket_id'     => $item->ticket_id,
-                            'ticket_code'   => $item->ticket_code,
-                            'ticket_st'     => $item->ticket_st ?? '',
-                            'ticket_free'   => $item->ticket_free ?? '',
-                            'ticket_seas'   => $item->ticket_seas ?? '',
-                            'ticket_passed' => $item->ticket_passed ?? '',
-                            'ticket_status' => $item->ticket_status,
-                        ];
-                    })->values()
+                    'event_id'         => $event->event_id,
+                    'event_image'      => $event->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $event->event_image,
+                    'event_name'       => $event->event_name,
+                    'event_lieu'       => $event->event_lieu,
+                    'event_date'       => $event->event_date,
+                    'event_time'       => $event->event_time,
+                    'porte_name'       => $event->porte_name,
+                    'total_tickets'    => (int) $event->total_tickets,
+                    'tickets_scannes'  => (int) $event->tickets_scannes,
                 ];
-            })
-            ->values();
+            });
 
         if ($events) {
             return response()->json($events, 200);
@@ -149,8 +145,9 @@ class ApiAgentsController extends Controller
     {
         $events = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
             ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
+            ->leftJoin('portes', 'associations.port_id', '=', 'portes.porte_id')
             ->where('associations.agence_id', '=', $id)
-            ->where('tickets.ticket_status', '=', 'UTILISE') // filtre sur ticket utilisé
+            ->where('tickets.ticket_status', '=', 'UTILISE')
             ->select(
                 'events.event_id',
                 'events.event_image',
@@ -158,45 +155,63 @@ class ApiAgentsController extends Controller
                 'events.event_lieu',
                 'events.event_date',
                 'events.event_time',
-                'tickets.ticket_id',
-                'tickets.ticket_code',
-                'tickets.ticket_st',
-                'tickets.ticket_free',
-                'tickets.ticket_seas',
-                'tickets.ticket_passed',
-                'tickets.ticket_status'
+                'portes.porte_name',
+                DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
+                DB::raw("SUM(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 ELSE 0 END) as tickets_scannes")
+            )
+            ->groupBy(
+                'events.event_id',
+                'events.event_image',
+                'events.event_name',
+                'events.event_lieu',
+                'events.event_date',
+                'events.event_time',
+                'portes.porte_name'
             )
             ->get()
-            ->groupBy('event_id')
-            ->map(function ($group) {
-                $first = $group->first();
+            ->map(function ($event) {
                 return [
-                    'event_id'     => $first->event_id,
-                    'event_image'  => $first->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $first->event_image,
-                    'event_name'   => $first->event_name,
-                    'event_lieu'   => $first->event_lieu,
-                    'event_date'   => $first->event_date,
-                    'event_time'   => $first->event_time,
-                    'tickets'      => $group->map(function ($item) {
-                        return [
-                            'ticket_id'     => $item->ticket_id,
-                            'ticket_code'   => $item->ticket_code,
-                            'ticket_st'     => $item->ticket_st,
-                            'ticket_free'   => $item->ticket_free,
-                            'ticket_seas'   => $item->ticket_seas,
-                            'ticket_passed' => $item->ticket_passed,
-                            'ticket_status' => $item->ticket_status,
-                        ];
-                    })->values()
+                    'event_id'         => $event->event_id,
+                    'event_image'      => $event->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $event->event_image,
+                    'event_name'       => $event->event_name,
+                    'event_lieu'       => $event->event_lieu,
+                    'event_date'       => $event->event_date,
+                    'event_time'       => $event->event_time,
+                    'porte_name'       => $event->porte_name,
+                    'total_tickets'    => (int) $event->total_tickets,
+                    'tickets_scannes'  => (int) $event->tickets_scannes,
                 ];
-            })
-            ->values();
+            });
 
         if ($events) {
             return response()->json($events, 200);
         } else {
             return response()->json([
                 'message' => "Pas d'évènement attribué."
+            ], 401);
+        }
+    }
+
+    public function getStats($id)
+    {
+        $stats = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
+            ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
+            ->where('associations.agence_id', '=', $id)
+            ->select(
+                DB::raw('COUNT(DISTINCT events.event_id) as total_evenements'),
+                DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
+                DB::raw("COUNT(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 END) as tickets_scannes")
+            )
+            ->groupBy('associations.agence_id')
+            ->first();
+
+        if ($stats) {
+            return response()->json($stats, 200);
+        } else {
+            return response()->json([
+                'total_evenements' => 0,
+                'total_tickets'   => 0,
+                'tickets_scannes' => 0
             ], 401);
         }
     }
@@ -224,7 +239,7 @@ class ApiAgentsController extends Controller
         $ticket = Tickets::where('ticket_code', $request->code)->first();
 
         if ($ticket) {
-            if ($ticket->ticket_status == 'ACTIVE') {
+            if ($ticket->ticket_status == 'Active') {
                 $asso = Associations::where('agence_id', $request->agent)->where('tickets_id', $ticket->ticket_id)->first();
                 if ($asso) {
 

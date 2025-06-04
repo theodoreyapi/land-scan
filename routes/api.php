@@ -13,3 +13,5 @@ Route::post('loginAgent', [ApiAgentsController::class, 'postLoginAgent']);
 Route::get('event/{id}', [ApiAgentsController::class, 'getEvent']);
 Route::get('eventFive/{id}', [ApiAgentsController::class, 'getEventFive']);
 Route::get('logout/{id}', [ApiAgentsController::class, 'logoutAgent']);
+Route::get('states/{id}', [ApiAgentsController::class, 'getStats']);
+Route::post('scanne', [ApiAgentsController::class, 'postScanCode']);
