@@ -14,16 +14,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(RolesTableSeeder::class);
         // User::factory(10)->create();
 
-        User::create([
+       $user = User::create([
             'name' => 'Yapi',
             'email' => 'theodoreyapi@gmail.com',
             'phone' => '0585831647',
-            'type' => 'super',
+            'type' => 'admin',
             'last_name' => 'Théodore',
             'status' => 'Active',
             'password' => hash::make(1234567890),
         ]);
+
+        $user->assignRole('admin');
     }
 }

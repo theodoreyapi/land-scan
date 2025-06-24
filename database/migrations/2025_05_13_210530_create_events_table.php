@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('event_lieu');
             $table->string('event_date');
             $table->string('event_time');
+            $table->string('event_date_fin');
+            $table->string('event_time_fin');
             $table->string('event_status')->comment('Active, Inactive')->default('Active');
             $table->timestamps();
         });

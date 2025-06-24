@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('last_name');
-            $table->string('type')->default('super')->comment('super, admin, employe');
+            $table->string('type')->default('admin')->comment('admin, superviseur, observateur');
             $table->string('email')->unique();
             $table->string('phone')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();

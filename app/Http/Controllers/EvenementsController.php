@@ -6,6 +6,7 @@ use App\Models\Events;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class EvenementsController extends Controller
 {
@@ -44,14 +45,16 @@ class EvenementsController extends Controller
             'lieu' => 'required',
             'date' => 'required',
             'time' => 'required',
-            'statut' => 'required',
+            'dateFin' => 'required',
+            'timeFin' => 'required',
         ];
         $customMessages = [
             'libelle.required' => "Veuillez saisir le libelle de l'évènement.",
             'lieu.required' => "Veuillez saisir le lieu de l'évènement.",
             'date.required' => "Veuillez choisir la date de l'évènement.",
             'time.required' => "Veuillez choisir l'heure de l'évènement.",
-            'statut.required' => "Veuillez sélectionner son statut.",
+            'dateFin.required' => "Veuillez choisir la date de fin de l'évènement.",
+            'timeFin.required' => "Veuillez choisir l'heure de fin de l'évènement.",
         ];
 
         $request->validate($roles, $customMessages);
@@ -62,11 +65,25 @@ class EvenementsController extends Controller
             $event->event_lieu = $request->lieu;
             $event->event_date = $request->date;
             $event->event_time = $request->time;
-            $event->event_status = $request->statut;
-            if ($event->save()) {
-                return back()->with('succes',  "Vous avez ajouter " . $request->nom);
+            $event->event_date_fin = $request->dateFin;
+            $event->event_time_fin = $request->timeFin;
+
+            // Combiner les dates et heures
+            $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
+            $endDateTime = Carbon::parse($request->dateFin . ' ' . $request->timeFin);
+            $now = Carbon::now();
+
+            // Comparer avec la date/heure actuelle
+            if ($endDateTime->lessThan($now)) {
+                $event->event_status = 'Inactive'; // ou 0, selon ta logique
             } else {
-                return back()->withErrors(["Impossible d'ajouter " . $request->nom . ". Veuillez réessayer!!"]);
+                $event->event_status = 'Active';   // ou 1, selon ta logique
+            }
+
+            if ($event->save()) {
+                return back()->with('succes',  "Vous avez ajouter " . $request->libelle);
+            } else {
+                return back()->withErrors(["Impossible d'ajouter " . $request->libelle . ". Veuillez réessayer!!"]);
             }
         } else {
             $fileStadeWithExtension = $request->file('photo')->getClientOriginalName();
@@ -79,11 +96,25 @@ class EvenementsController extends Controller
             $event->event_lieu = $request->lieu;
             $event->event_date = $request->date;
             $event->event_time = $request->time;
-            $event->event_status = $request->statut;
-            if ($event->save()) {
-                return back()->with('succes',  "Vous avez ajouter " . $request->nom);
+            $event->event_date_fin = $request->dateFin;
+            $event->event_time_fin = $request->timeFin;
+
+            // Combiner les dates et heures
+            $startDateTime = Carbon::parse($request->date . ' ' . $request->time);
+            $endDateTime = Carbon::parse($request->dateFin . ' ' . $request->timeFin);
+            $now = Carbon::now();
+
+            // Comparer avec la date/heure actuelle
+            if ($endDateTime->lessThan($now)) {
+                $event->event_status = 'Inactive'; // ou 0, selon ta logique
             } else {
-                return back()->withErrors(["Impossible d'ajouter " . $request->nom . ". Veuillez réessayer!!"]);
+                $event->event_status = 'Active';   // ou 1, selon ta logique
+            }
+
+            if ($event->save()) {
+                return back()->with('succes',  "Vous avez ajouter " . $request->libelle);
+            } else {
+                return back()->withErrors(["Impossible d'ajouter " . $request->libelle . ". Veuillez réessayer!!"]);
             }
         }
     }
@@ -116,6 +147,8 @@ class EvenementsController extends Controller
             'lieu' => 'required',
             'date' => 'required',
             'time' => 'required',
+            'dateFin' => 'required',
+            'timeFin' => 'required',
             'statut' => 'required',
         ];
         $customMessages = [
@@ -123,6 +156,8 @@ class EvenementsController extends Controller
             'lieu.required' => "Veuillez saisir le lieu de l'évènement.",
             'date.required' => "Veuillez choisir la date de l'évènement.",
             'time.required' => "Veuillez choisir l'heure de l'évènement.",
+            'dateFin.required' => "Veuillez choisir la date de fin de l'évènement.",
+            'timeFin.required' => "Veuillez choisir l'heure de fin de l'évènement.",
             'statut.required' => "Veuillez sélectionner son statut.",
         ];
 
@@ -134,6 +169,8 @@ class EvenementsController extends Controller
             $event->event_lieu = $request->lieu;
             $event->event_date = $request->date;
             $event->event_time = $request->time;
+            $event->event_date_fin = $request->dateFin;
+            $event->event_time_fin = $request->timeFin;
             $event->event_status = $request->statut;
             if ($event->save()) {
                 return back()->with('succes', "Vous avez modifier avec succès.");
@@ -150,6 +187,8 @@ class EvenementsController extends Controller
             $event->event_lieu = $request->lieu;
             $event->event_date = $request->date;
             $event->event_time = $request->time;
+            $event->event_date_fin = $request->dateFin;
+            $event->event_time_fin = $request->timeFin;
             $event->event_status = $request->statut;
             if ($event->save()) {
                 return back()->with('succes', "Vous avez modifier avec succès.");

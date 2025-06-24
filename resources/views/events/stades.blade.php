@@ -1,5 +1,5 @@
 @extends('layouts.master', [
-    'title' => 'Portes',
+    'title' => 'Stades',
 ])
 
 @push('csss')
@@ -62,16 +62,16 @@
     <div class="content">
         <div class="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
             <div class="my-auto mb-2">
-                <h2 class="mb-1">Portes</h2>
+                <h2 class="mb-1">Stades</h2>
                 <nav>
                     <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item">
                             <a href="index.html"><i class="ti ti-smart-home"></i></a>
                         </li>
                         <li class="breadcrumb-item">
-                            Portes
+                            Stades
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">Liste porte</li>
+                        <li class="breadcrumb-item active" aria-current="page">Liste des stades</li>
                     </ol>
                 </nav>
             </div>
@@ -79,8 +79,8 @@
                 <div class="me-2 mb-2"></div>
                 <div class="mb-2">
                     <a href="#" data-bs-toggle="modal" data-bs-target="#add_employee"
-                        class="btn btn-primary d-flex align-items-center"><i class="ti ti-circle-plus me-2"></i>Ajouter une
-                        porte</a>
+                        class="btn btn-primary d-flex align-items-center"><i class="ti ti-circle-plus me-2"></i>Ajouter un
+                        stade</a>
                 </div>
                 <div class="head-icons ms-2">
                     <a href="javascript:void(0);" class="" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -96,30 +96,39 @@
 
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-                <h5>Liste des portes</h5>
+                <h5>Liste des évènements</h5>
             </div>
             <div class="card-body p-0">
                 <div class="custom-datatable-filter table-responsive">
                     <table class="table datatable">
                         <thead class="thead-light">
                             <tr>
-                                <th>Porte</th>
                                 <th>Stade</th>
+                                <th>Adresse</th>
+                                <th>Portes</th>
                                 <th>Statut</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($portes as $porte)
+                            @foreach ($all as $agent)
                                 <tr>
                                     <td>
-                                        <p class="text-dark mb-0">{{ $porte->porte_name }}</p>
+                                        <div class="d-flex align-items-center">
+                                            <a href="#" class="avatar avatar-md" data-bs-toggle="modal"
+                                                data-bs-target="#view_details"><img
+                                                    src="{{ $agent->stade_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('stades-image') . '/' . $agent->stade_image }}"
+                                                    class="img-fluid rounded-circle" alt="img"></a>
+                                            <div class="ms-2">
+                                                <p class="text-dark mb-0"><a href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#view_details">{{ $agent->stade_name }}</a></p>
+                                            </div>
+                                        </div>
                                     </td>
+                                    <td>{{ $agent->stade_address }}</td>
+                                    <td>{{ $agent->total }}</td>
                                     <td>
-                                        <p class="text-dark mb-0">{{ $porte->stade_name }}</p>
-                                    </td>
-                                    <td>
-                                        @if ($porte->porte_status == 'Active')
+                                        @if ($agent->stade_status == 'Active')
                                             <span class="badge badge-success d-inline-flex align-items-center badge-xs">
                                                 <i class="ti ti-point-filled me-1"></i>Active
                                             </span>
@@ -132,46 +141,45 @@
                                     <td>
                                         <div class="action-icon d-inline-flex">
                                             <a href="#" class="me-2" data-bs-toggle="modal"
-                                                data-bs-target="#edit_employee{{ $porte->porte_id }}"><i
+                                                data-bs-target="#edit_employee{{ $agent->stade_id }}"><i
                                                     class="ti ti-edit"></i></a>
                                             <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#delete_modal{{ $porte->porte_id }}"><i
+                                                data-bs-target="#delete_modal{{ $agent->stade_id }}"><i
                                                     class="ti ti-trash"></i></a>
                                         </div>
-                                        <div class="modal fade" id="edit_employee{{ $porte->porte_id }}">
+                                        <div class="modal fade" id="edit_employee{{ $agent->stade_id }}">
                                             <div class="modal-dialog modal-dialog-centered modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header bg-secondary">
                                                         <div class="d-flex align-items-center">
-                                                            <h4 class="modal-title me-2 text-white">
-                                                                Modification
-                                                            </h4>
+                                                            <h4 class="modal-title me-2 text-white">Modification</h4>
                                                         </div>
                                                         <button type="button" class="btn-close custom-btn-close"
                                                             data-bs-dismiss="modal" aria-label="Close">
                                                             <i class="ti ti-x"></i>
                                                         </button>
                                                     </div>
-                                                    <form action="{{ route('portes.update', $porte->porte_id) }}"
-                                                        method="POST" role="form">
+                                                    <form action="{{ route('stades.update', $agent->stade_id) }}"
+                                                        method="POST" role="form" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PATCH')
                                                         <div class="modal-body pb-0 ">
                                                             <div class="row">
-                                                                <div class="col-md-6">
-                                                                    <div class="mb-3">
-                                                                        <label class="form-label">Stade <span
-                                                                                class="text-danger">
-                                                                                *</span></label>
-                                                                        <br>
-                                                                        <select name="stade" required class="select">
-                                                                            @foreach ($stades as $item)
-                                                                                <option
-                                                                                    @if ($porte->stades_id == $item->stade_id) selected @endif
-                                                                                    value="{{ $item->stade_id }}">
-                                                                                    {{ $item->stade_name }}</option>
-                                                                            @endforeach
-                                                                        </select>
+                                                                <div class="col-md-12">
+                                                                    <label for="" class="form-label">Photo</label>
+                                                                    <div
+                                                                        class="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                                                                        <img src="{{ $agent->stade_image == null ? URL::asset('assets/img/users/user-13.jpg') : URL::asset('stades-image') . '/' . $agent->stade_image }}"
+                                                                            alt="img" class=""
+                                                                            style="height: 300px; width: 100%;">
+                                                                        <div class="profile-upload col-md-12">
+                                                                            <div
+                                                                                class="profile-uploader d-flex align-items-center">
+                                                                                <input type="file"
+                                                                                    class="form-control image-sign"
+                                                                                    name="photo">
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -181,7 +189,15 @@
                                                                                 *</span></label>
                                                                         <input type="text" name="libelle" required
                                                                             class="form-control"
-                                                                            value="{{ $porte->porte_name }}">
+                                                                            value="{{ $agent->stade_name }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Adresse</label>
+                                                                        <input type="text" name="adresse"
+                                                                            class="form-control"
+                                                                            value="{{ $agent->stade_address }}">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
@@ -192,10 +208,10 @@
                                                                         <br>
                                                                         <select name="statut" required class="select">
                                                                             <option
-                                                                                @if ($porte->porte_status == 'Active') selected @endif
+                                                                                @if ($agent->stade_status == 'Active') selected @endif
                                                                                 value="Active">Active</option>
                                                                             <option
-                                                                                @if ($porte->porte_status == 'Inactive') selected @endif
+                                                                                @if ($agent->stade_status == 'Inactive') selected @endif
                                                                                 value="Inactive">Inactive</option>
                                                                         </select>
                                                                     </div>
@@ -213,9 +229,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="modal fade" id="delete_modal{{ $porte->porte_id }}">
+                                        <div class="modal fade" id="delete_modal{{ $agent->stade_id }}">
                                             <div class="modal-dialog modal-dialog-centered modal-sm">
-                                                <form action="{{ route('portes.destroy', $porte->porte_id) }}"
+                                                <form action="{{ route('stades.destroy', $agent->stade_id) }}"
                                                     method="POST">
                                                     @csrf
                                                     @method('DELETE')
@@ -227,7 +243,8 @@
                                                             </span>
                                                             <h4 class="mb-1">Confirmer la suppression</h4>
                                                             <p class="mb-3">
-                                                                Vous souhaitez supprimer tous l'agent,
+                                                                Vous souhaitez supprimer l'agent,
+                                                                <br>
                                                             <div class="alert alert-warning alert-dismissible fade show">
                                                                 <strong>Cette opération ne peut pas être annulée une
                                                                     fois supprimée.</strong>
@@ -259,28 +276,26 @@
             <div class="modal-content">
                 <div class="modal-header bg-primary">
                     <div class="d-flex align-items-center">
-                        <h4 class="modal-title me-2 text-white">Ajout d'une nouvelle porte</h4>
+                        <h4 class="modal-title me-2 text-white">Ajout d'un nouveau stade</h4>
                     </div>
                     <button type="button" class="btn-close custom-btn-close" data-bs-dismiss="modal"
                         aria-label="Close">
                         <i class="ti ti-x"></i>
                     </button>
                 </div>
-                <form action="{{ route('portes.store') }}" method="POST" role="form">
+                <form action="{{ route('stades.store') }}" method="POST" role="form"
+                    enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body pb-0 ">
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Stade <span class="text-danger">
-                                            *</span></label>
-                                    <br>
-                                    <select name="stade" required class="select">
-                                        <option value="">Sélectionne</option>
-                                        @foreach ($stades as $item)
-                                            <option value="{{ $item->stade_id }}">{{ $item->stade_name }}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="col-md-12">
+                                <label for="" class="form-label">Photo</label>
+                                <div class="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
+                                    <div class="profile-upload col-md-12">
+                                        <div class="profile-uploader d-flex align-items-center">
+                                            <input required type="file" class="form-control image-sign" name="photo">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -288,6 +303,12 @@
                                     <label class="form-label">Libelle <span class="text-danger">
                                             *</span></label>
                                     <input type="text" name="libelle" required class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Adresse</label>
+                                    <input type="text" name="adresse" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">

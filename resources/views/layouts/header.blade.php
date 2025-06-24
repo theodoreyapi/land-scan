@@ -53,8 +53,8 @@
                                              alt="img">
                                      </span>
                                      <div>
-                                         <h5 class="mb-0">{{ Auth::user()->name }}</h5>
-                                         <p class="fs-12 fw-medium mb-0">{{ Auth::user()->phone }}</p>
+                                         <h5 class="mb-0">{{ Auth::user()->name ?? "" }}</h5>
+                                         <p class="fs-12 fw-medium mb-0">{{ Auth::user()->phone ?? "" }}</p>
                                      </div>
                                  </div>
                              </div>

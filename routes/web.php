@@ -1,11 +1,17 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AgentsController;
 use App\Http\Controllers\AssociationsController;
 use App\Http\Controllers\CustomAuthController;
 use App\Http\Controllers\EvenementsController;
+use App\Http\Controllers\ObservateurController;
 use App\Http\Controllers\PortesController;
+use App\Http\Controllers\StadeController;
+use App\Http\Controllers\SuperviseurController;
 use App\Http\Controllers\TicketsController;
+use App\Http\Controllers\UserController;
 use App\Models\Agents;
 use App\Models\Events;
 use App\Models\Portes;
@@ -23,6 +29,29 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
+// Admin
+Route::middleware(['role:admin'])->group(function () {
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
+});
+// Superviseur
+Route::middleware(['role:superviseur'])->group(function () {
+    Route::get('/evenements', [AdminController::class, 'index'])->name('superviseur.dashboard');
+});
+// Observateur
+Route::middleware(['role:observateur'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('observateur.dashboard');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/event/{id}/stats', [AdminController::class, 'eventStats'])->name('dashboard.event.stats');
+});
+
+
+// Create admin
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
+    Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin.users.store');
+});
 
 //error
 Route::fallback(function () {
@@ -33,24 +62,6 @@ Route::fallback(function () {
 Route::get('profile', function () {
     return view('profile.profile');
 });
-Route::get('profile-settings', function () {
-    return view('profile.profile-settings');
-});
-Route::get('security-settings', function () {
-    return view('profile.security-settings');
-});
-Route::get('sms-settings', function () {
-    return view('profile.sms-settings');
-});
-Route::get('sms-template', function () {
-    return view('profile.sms-template');
-});
-Route::get('email-template', function () {
-    return view('profile.email-template');
-});
-Route::get('email-settings', function () {
-    return view('profile.email-settings');
-});
 
 //CRM
 Route::get('activity', function () {
@@ -58,23 +69,7 @@ Route::get('activity', function () {
 });
 
 //Users Management
-Route::get('users', function () {
-    return view('roles.users');
-});
-
-//Repports
-Route::get('attendance-report', function () {
-    return view('reports.attendance-report');
-});
-Route::get('daily-report', function () {
-    return view('reports.daily-report');
-});
-Route::get('leave-report', function () {
-    return view('reports.leave-report');
-});
-Route::get('employee-report', function () {
-    return view('reports.employee-report');
-});
+Route::resource('users', UserController::class);
 
 // HRM
 Route::resource('agences', AgentsController::class);
@@ -91,4 +86,5 @@ Route::resource('departments', EvenementsController::class);
 Route::get('/tickets/event/{id}', [TicketsController::class, 'getByEvent']);
 Route::resource('designations', TicketsController::class);
 Route::resource('associations', AssociationsController::class);
+Route::resource('stades', StadeController::class);
 Route::resource('portes', PortesController::class);

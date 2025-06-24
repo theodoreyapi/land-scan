@@ -65,6 +65,28 @@
     <script src="{{ URL::asset('') }}assets/js/todo.js"></script>
     <script src="{{ URL::asset('') }}assets/js/theme-colorpicker.js"></script>
     <script src="{{ URL::asset('') }}assets/js/script.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.1/highcharts.js"></script>
+    <script>
+        document.querySelectorAll('.event-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const eventId = this.getAttribute('data-id');
+
+                fetch(`/dashboard/event/${eventId}/stats`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('stats-zone').innerHTML = `
+                        <h5>Statistiques</h5>
+                        <p><strong>Participants :</strong> ${data.stats.nbParticipants}</p>
+                        <p><strong>Observateurs :</strong> ${data.stats.nbObservateurs}</p>
+                        <div id="chart-container"></div>
+                    `;
+
+                        Highcharts.chart('chart-container', data.chart);
+                    });
+            });
+        });
+    </script>
 @endpush
 
 @section('content')
@@ -104,177 +126,25 @@
         </div>
         <!-- /Breadcrumb -->
 
-        <!-- Welcome Wrap -->
-        <div class="card border-0">
-            <div class="card-body d-flex align-items-center justify-content-between flex-wrap pb-1">
-                <div class="d-flex align-items-center mb-3">
-                    <span class="avatar avatar-xl flex-shrink-0">
-                        <img src="{{ URL::asset('') }}assets/img/profiles/avatar-31.jpg" class="rounded-circle"
-                            alt="img">
-                    </span>
-                    <div class="ms-3">
-                        <h3 class="mb-2">Bienvenue, {{ Auth::user()->name }} <a href="javascript:void(0);"
-                                class="edit-icon"><i class="ti ti-edit fs-14"></i></a>
-                        </h3>
-                        <p>Vous avez <span class="text-primary text-decoration-underline">21</span> Tickets en attente</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- /Welcome Wrap -->
-
         <div class="row">
-
-            <!-- Widget Info -->
-            <div class="col-xxl-12 d-flex">
-                <div class="row flex-fill">
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-primary mb-2">
-                                    <i class="ti ti-calendar-share fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Evénements</h6>
-                                <h3 class="mb-3">120/154</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-dark mb-2">
-                                    <i class="ti ti-user-star fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Tickets</h6>
-                                <h3 class="mb-3">45/48</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-dark mb-2">
-                                    <i class="ti ti-user-star fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Tickets scannés</h6>
-                                <h3 class="mb-3">45/48</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-dark mb-2">
-                                    <i class="ti ti-user-star fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Tickets validés</h6>
-                                <h3 class="mb-3">45/48</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-dark mb-2">
-                                    <i class="ti ti-user-star fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Agents</h6>
-                                <h3 class="mb-3">45/48</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card flex-fill">
-                            <div class="card-body">
-                                <span class="avatar rounded-circle bg-dark mb-2">
-                                    <i class="ti ti-user-star fs-16"></i>
-                                </span>
-                                <h6 class="fs-13 fw-medium text-default mb-1">Utilisateurs</h6>
-                                <h3 class="mb-3">45/48</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Liste des événements -->
+            <div class="col-md-4">
+                <h5>Événements actifs</h5>
+                <ul class="list-group" id="event-list">
+                    @foreach ($events as $event)
+                        <li class="list-group-item event-item" data-id="{{ $event->id }}" style="cursor:pointer;">
+                            <h5>{{ $event->event_name }}</h5>
+                            <small>{{ $event->event_date }} à {{ $event->event_time }}</small>
+                        </li>
+                        <br>
+                    @endforeach
+                </ul>
             </div>
-            <!-- /Widget Info -->
-        </div>
 
-        <div class="row">
-            <!-- Attendance Overview -->
-            <div class="col-xxl-4 col-xl-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Statistiques</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chartjs-wrapper-demo position-relative mb-4">
-                            <canvas id="attendance" height="200"></canvas>
-                            <div class="position-absolute text-center attendance-canvas">
-                                <p class="fs-13 mb-1">Total Tickets</p>
-                                <h3>120</h3>
-                            </div>
-                        </div>
-                        <h6 class="mb-3">Status</h6>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <p class="f-13 mb-2"><i class="ti ti-circle-filled text-success me-1"></i>Present</p>
-                            <p class="f-13 fw-medium text-gray-9 mb-2">59%</p>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <p class="f-13 mb-2"><i class="ti ti-circle-filled text-secondary me-1"></i>Late
-                            </p>
-                            <p class="f-13 fw-medium text-gray-9 mb-2">21%</p>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <p class="f-13 mb-2"><i class="ti ti-circle-filled text-warning me-1"></i>Permission</p>
-                            <p class="f-13 fw-medium text-gray-9 mb-2">2%</p>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <p class="f-13 mb-2"><i class="ti ti-circle-filled text-danger me-1"></i>Absent
-                            </p>
-                            <p class="f-13 fw-medium text-gray-9 mb-2">15%</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /Attendance Overview -->
-
-            <div class="col-xxl-8 col-xl-6 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header pb-2 d-flex align-items-center justify-content-between flex-wrap">
-                        <h5 class="mb-2">Agents</h5>
-                        <a href="{{ url('agences') }}" class="btn btn-light btn-md mb-2">Tout voir</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-nowrap mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Nom</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <a href="javascript:void(0);" class="avatar">
-                                                    <img src="{{ URL::asset('') }}assets/img/users/user-32.jpg"
-                                                        class="img-fluid rounded-circle" alt="img">
-                                                </a>
-                                                <div class="ms-2">
-                                                    <h6 class="fw-medium"><a href="javascript:void(0);">Anthony Lewis</a>
-                                                    </h6>
-                                                    <span class="fs-12">Finance</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <!-- Zone de stats -->
+            <div class="col-md-8" id="stats-zone">
+                <p>Sélectionnez un événement pour voir ses statistiques.</p>
             </div>
         </div>
-
     </div>
 @endsection

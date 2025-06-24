@@ -12,6 +12,8 @@ class Portes extends Model
 
     protected $fillable = [
         'porte_name',
+        'stades_id',
+        'porte_status',
     ];
 
     protected $table = 'portes';

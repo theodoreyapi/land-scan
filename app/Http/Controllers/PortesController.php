@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Portes;
+use App\Models\Stades;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,8 +17,11 @@ class PortesController extends Controller
         if (!Auth::check()) {
             return view('auth.login');
         }
-        $portes = Portes::all();
-        return view('events.portes', compact('portes'));
+        $stades = Stades::where('stade_status', '=', 'Active')->get();
+        $portes = Portes::join('stades', 'portes.stades_id', '=', 'stades.stade_id')
+            ->select('portes.*', 'stades.stade_name')
+            ->get();
+        return view('events.portes', compact('portes', 'stades'));
     }
 
     /**
@@ -34,17 +38,22 @@ class PortesController extends Controller
     public function store(Request $request)
     {
         $roles = [
-            'libelle' => 'required|unique:portes,porte_name',
+            'stade' => 'required',
+            'statut' => 'required',
+            'libelle' => 'required',
         ];
         $customMessages = [
-            'libelle.unique' => $request->libelle . " existe déjà. Veuillez essayer une autre.",
             'libelle.required' => "Veuillez saisir le libelle de la porte.",
+            'stade.required' => "Veuillez sélectionner le stade de la porte.",
+            'statut.required' => "Veuillez sélectionner son statut.",
         ];
 
         $request->validate($roles, $customMessages);
 
         $porte = new Portes();
         $porte->porte_name = $request->libelle;
+        $porte->porte_status = $request->statut;
+        $porte->stades_id = $request->stade;
         if ($porte->save()) {
             return back()->with('succes',  "Vous avez ajouter " . $request->libelle);
         } else {
@@ -76,10 +85,14 @@ class PortesController extends Controller
         $porte = Portes::findOrFail($id);
 
         $roles = [
+            'stade' => 'required',
+            'statut' => 'required',
             'libelle' => 'required',
         ];
         $customMessages = [
             'libelle.required' => "Veuillez saisir le libelle de la porte.",
+            'stade.required' => "Veuillez sélectionner le stade de la porte.",
+            'statut.required' => "Veuillez sélectionner son statut.",
         ];
 
         $request->validate($roles, $customMessages);
@@ -87,6 +100,9 @@ class PortesController extends Controller
         if ($porte->porte_name !== $request->libelle) {
             $porte->porte_name = $request->libelle;
         }
+
+        $porte->porte_status = $request->statut;
+        $porte->stades_id = $request->stade;
 
         if ($porte->save()) {
             return back()->with('succes', "Vous avez modifier avec succès.");

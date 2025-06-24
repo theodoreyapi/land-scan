@@ -104,9 +104,8 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>Libelle</th>
-                                <th>Lieu</th>
-                                <th>Date</th>
-                                <th>Heure</th>
+                                <th>Début Date & Heure</th>
+                                <th>Fin Date &Heure</th>
                                 <th>Nbre ticket</th>
                                 <th>Statut</th>
                                 <th></th>
@@ -124,12 +123,12 @@
                                             <div class="ms-2">
                                                 <p class="text-dark mb-0"><a href="#" data-bs-toggle="modal"
                                                         data-bs-target="#view_details">{{ $agent->event_name }}</a></p>
+                                                <p class="text-dark mb-0">{{ $agent->event_lieu }}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{{ $agent->event_lieu }}</td>
-                                    <td>{{ $agent->event_date }}</td>
-                                    <td>{{ $agent->event_time }}</td>
+                                    <td>{{ $agent->event_date }} à {{ $agent->event_time }}</td>
+                                    <td>{{ $agent->event_date_fin }} à {{ $agent->event_time_fin }}</td>
                                     <td>{{ $agent->total }}</td>
                                     <td>
                                         @if ($agent->event_status == 'Active')
@@ -228,6 +227,26 @@
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="mb-3">
+                                                                        <label class="form-label">Date Fin <span
+                                                                                class="text-danger">
+                                                                                *</span></label>
+                                                                        <input type="date" required name="dateFin"
+                                                                            class="form-control"
+                                                                            value="{{ $agent->event_date_fin }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Heure Fin <span
+                                                                                class="text-danger">
+                                                                                *</span></label>
+                                                                        <input type="time" required name="timeFin"
+                                                                            class="form-control"
+                                                                            value="{{ $agent->event_time_fin }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="mb-3">
                                                                         <label class="form-label">Statut <span
                                                                                 class="text-danger">
                                                                                 *</span></label>
@@ -317,7 +336,7 @@
                             <div class="col-md-12">
                                 <label for="" class="form-label">Photo</label>
                                 <div class="d-flex align-items-center flex-wrap row-gap-3 bg-light w-100 rounded p-3 mb-4">
-                                    <div class="profile-upload">
+                                    <div class="profile-upload col-md-12">
                                         <div class="profile-uploader d-flex align-items-center">
                                             <input type="file" class="form-control image-sign" name="photo">
                                         </div>
@@ -340,27 +359,30 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Date <span class="text-danger">
+                                    <label class="form-label">Date Début <span class="text-danger">
                                             *</span></label>
                                     <input type="date" required name="date" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Heure <span class="text-danger">
+                                    <label class="form-label">Heure Début <span class="text-danger">
                                             *</span></label>
                                     <input type="time" required name="time" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Statut <span class="text-danger">
+                                    <label class="form-label">Date Fin <span class="text-danger">
                                             *</span></label>
-                                    <select name="statut" required class="select">
-                                        <option value="">Sélectionne</option>
-                                        <option value="Active">Active</option>
-                                        <option value="Inactive">Inactive</option>
-                                    </select>
+                                    <input type="date" required name="dateFin" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Heure Fin <span class="text-danger">
+                                            *</span></label>
+                                    <input type="time" required name="timeFin" class="form-control">
                                 </div>
                             </div>
                         </div>
