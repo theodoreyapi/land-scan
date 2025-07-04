@@ -233,7 +233,7 @@
             }
         </style>
 
-        <script>
+        {{-- <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const cards = document.querySelectorAll('.ticket-card');
 
@@ -259,7 +259,7 @@
                     checkbox.addEventListener('click', e => e.stopPropagation());
                 });
             });
-        </script>
+        </script> --}}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const cards = document.querySelectorAll('.agent-card');
@@ -319,7 +319,7 @@
             @csrf
             <div class="col-md-12 card">
                 <div class="mb-3 card-header">
-                    <label class="form-label">Évènement <span class="text-danger">
+                    <label class="form-label">ÉVÈNEMENT <span class="text-danger">
                             *</span></label>
                     <br>
                 </div>
@@ -334,7 +334,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            {{-- <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
                     <h5>TICKETS</h5>
                 </div>
@@ -343,7 +343,7 @@
 
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
                     <h5>AGENTS</h5>

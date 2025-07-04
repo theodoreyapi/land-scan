@@ -163,10 +163,12 @@
                                      </li>
                                      <li><a class="{{ Request::is('departments') ? 'active' : '' }}"
                                              href="{{ url('departments') }}">Evènements</a></li>
-                                     <li><a class="{{ Request::is('designations') ? 'active' : '' }}"
-                                             href="{{ url('designations') }}">Tickets</a></li>
+                                     @role('admin')
+                                         <li><a class="{{ Request::is('designations') ? 'active' : '' }}"
+                                                 href="{{ url('designations') }}">Tickets</a></li>
+                                     @endrole
                                      <li><a class="{{ Request::is('associations') ? 'active' : '' }}{{ Request::is('add-associate') ? 'active' : '' }}"
-                                             href="{{ url('associations') }}">Associé Tickets - Agents - Portes</a></li>
+                                             href="{{ url('associations') }}">Associé Events - Agents - Portes</a></li>
                                  </ul>
                              </li>
                          </ul>

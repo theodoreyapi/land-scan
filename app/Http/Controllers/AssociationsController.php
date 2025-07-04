@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agents;
 use App\Models\Associations;
+use App\Models\EventsAgents;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class AssociationsController extends Controller
 
         $all = Agents::select(
             'agents.*',
-            DB::raw('(SELECT COUNT(*) FROM associations WHERE associations.agence_id = agents.agent_id) AS total')
+            DB::raw('(SELECT COUNT(*) FROM events_agents WHERE events_agents.agents_id = agents.agent_id) AS total')
         )->get();
 
         return view('events.associations', compact('all'));
@@ -40,24 +41,20 @@ class AssociationsController extends Controller
      */
     public function store(Request $request)
     {
-
-        $ticketId = $request->input('tickets', []);
         $agentId = $request->input('agents', []);
         $porteId = $request->input('portes', []);
 
-        if (empty($ticketId) || empty($agentId) || empty($porteId)) {
-            return back()->withErrors(["Au moins un agent, une porte et un ticket doivent être sélectionnés."]);
+        if (empty($agentId) || empty($porteId)) {
+            return back()->withErrors(["Au moins un agent, une porte et un évènement doivent être sélectionnés."]);
         }
 
-        foreach ($ticketId as $ticket) {
-            foreach ($agentId as $agent) {
-                foreach ($porteId as $porte) {
-                    $association = new Associations();
-                    $association->tickets_id = $ticket;
-                    $association->agence_id = $agent;
-                    $association->port_id = $porte;
-                    $association->save();
-                }
+        foreach ($agentId as $agent) {
+            foreach ($porteId as $porte) {
+                $association = new EventsAgents();
+                $association->events_id = $request->event;
+                $association->agents_id = $agent;
+                $association->portes_id = $porte;
+                $association->save();
             }
         }
 
@@ -93,6 +90,8 @@ class AssociationsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        EventsAgents::where('agents_id', $id)->delete();
+
+        return back()->with('succes', "La suppression a été effectué");
     }
 }

@@ -24,6 +24,20 @@ class EvenementsController extends Controller
             DB::raw('(SELECT COUNT(*) FROM tickets WHERE tickets.evenment_id = events.event_id) AS total')
         )->get();
 
+        $now = Carbon::now();
+
+        foreach ($all as $event) {
+            $endDateTime = Carbon::parse($event->event_date_fin . ' ' . $event->event_time_fin);
+
+            if ($endDateTime->lessThan($now)) {
+                $event->event_status = 'Inactive'; // ou 0
+            } else {
+                $event->event_status = 'Active';   // ou 1
+            }
+
+            $event->save();
+        }
+
         return view('events.events', compact('all'));
     }
 

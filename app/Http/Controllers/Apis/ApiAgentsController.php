@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis;
 use App\Http\Controllers\Controller;
 use App\Models\Agents;
 use App\Models\Associations;
+use App\Models\EventsAgents;
 use App\Models\Tickets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,12 +91,13 @@ class ApiAgentsController extends Controller
     }
 
 
-    public function getEventFive($id)
+    public function getEventFive($agentId)
     {
-        $events = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
+        $rawEvents = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
             ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
-            ->leftJoin('portes', 'associations.port_id', '=', 'portes.porte_id')
-            ->where('associations.agence_id', '=', $id)
+            ->join('portes', 'associations.port_id', '=', 'portes.porte_id')
+            ->join('events_agents', 'events.event_id', '=', 'events_agents.events_id')
+            ->where('events_agents.agents_id', '=', $agentId)
             ->where('tickets.ticket_status', '=', 'Active')
             ->select(
                 'events.event_id',
@@ -105,48 +107,49 @@ class ApiAgentsController extends Controller
                 'events.event_date',
                 'events.event_time',
                 'portes.porte_name',
-                DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
-                DB::raw("SUM(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 ELSE 0 END) as tickets_scannes")
+                'tickets.ticket_status'
             )
-            ->groupBy(
-                'events.event_id',
-                'events.event_image',
-                'events.event_name',
-                'events.event_lieu',
-                'events.event_date',
-                'events.event_time',
-                'portes.porte_name'
-            )
-            ->get()
-            ->map(function ($event) {
-                return [
-                    'event_id'         => $event->event_id,
-                    'event_image'      => $event->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $event->event_image,
-                    'event_name'       => $event->event_name,
-                    'event_lieu'       => $event->event_lieu,
-                    'event_date'       => $event->event_date,
-                    'event_time'       => $event->event_time,
-                    'porte_name'       => $event->porte_name,
-                    'total_tickets'    => (int) $event->total_tickets,
-                    'tickets_scannes'  => (int) $event->tickets_scannes,
-                ];
-            });
+            ->get();
 
-        if ($events) {
+        // Regroupement par événement
+        $grouped = $rawEvents->groupBy('event_id');
+
+        $events = $grouped->map(function ($items, $eventId) {
+            $first = $items->first();
+
+            $portes = $items->pluck('porte_name')->unique()->values();
+
+            return [
+                'event_id'         => $eventId,
+                'event_image'      => $first->event_image == null
+                    ? URL::asset('assets/img/users/user-36.jpg')
+                    : URL::asset('events/' . $first->event_image),
+                'event_name'       => $first->event_name,
+                'event_lieu'       => $first->event_lieu,
+                'event_date'       => $first->event_date,
+                'event_time'       => $first->event_time,
+                'portes'           => $portes, // Tableau de portes
+                'total_tickets'    => $items->count(),
+                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->count(),
+            ];
+        })->values();
+
+        if ($events->count() > 0) {
             return response()->json($events, 200);
         } else {
             return response()->json([
-                'message' => "Pas d'évènement attribué."
-            ], 401);
+                'message' => "Pas d'événement attribué à cet agent."
+            ], 404);
         }
     }
 
-    public function getEvent($id)
+    public function getEvent($agentId)
     {
-        $events = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
+        $rawEvents = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
             ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
-            ->leftJoin('portes', 'associations.port_id', '=', 'portes.porte_id')
-            ->where('associations.agence_id', '=', $id)
+            ->join('portes', 'associations.port_id', '=', 'portes.porte_id')
+            ->join('events_agents', 'events.event_id', '=', 'events_agents.events_id')
+            ->where('events_agents.agents_id', '=', $agentId)
             ->where('tickets.ticket_status', '=', 'UTILISE')
             ->select(
                 'events.event_id',
@@ -156,53 +159,52 @@ class ApiAgentsController extends Controller
                 'events.event_date',
                 'events.event_time',
                 'portes.porte_name',
-                DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
-                DB::raw("SUM(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 ELSE 0 END) as tickets_scannes")
+                'tickets.ticket_status'
             )
-            ->groupBy(
-                'events.event_id',
-                'events.event_image',
-                'events.event_name',
-                'events.event_lieu',
-                'events.event_date',
-                'events.event_time',
-                'portes.porte_name'
-            )
-            ->get()
-            ->map(function ($event) {
-                return [
-                    'event_id'         => $event->event_id,
-                    'event_image'      => $event->event_image == null ? URL::asset('assets/img/users/user-36.jpg') : URL::asset('events') . '/' . $event->event_image,
-                    'event_name'       => $event->event_name,
-                    'event_lieu'       => $event->event_lieu,
-                    'event_date'       => $event->event_date,
-                    'event_time'       => $event->event_time,
-                    'porte_name'       => $event->porte_name,
-                    'total_tickets'    => (int) $event->total_tickets,
-                    'tickets_scannes'  => (int) $event->tickets_scannes,
-                ];
-            });
+            ->get();
 
-        if ($events) {
+        // Regroupement par événement
+        $grouped = $rawEvents->groupBy('event_id');
+
+        $events = $grouped->map(function ($items, $eventId) {
+            $first = $items->first();
+
+            return [
+                'event_id'         => $eventId,
+                'event_image'      => $first->event_image == null
+                    ? URL::asset('assets/img/users/user-36.jpg')
+                    : URL::asset('events/' . $first->event_image),
+                'event_name'       => $first->event_name,
+                'event_lieu'       => $first->event_lieu,
+                'event_date'       => $first->event_date,
+                'event_time'       => $first->event_time,
+                'portes'           => $items->pluck('porte_name')->unique()->values(),
+                'total_tickets'    => $items->count(),
+                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->count(),
+            ];
+        })->values();
+
+        if ($events->count() > 0) {
             return response()->json($events, 200);
         } else {
             return response()->json([
-                'message' => "Pas d'évènement attribué."
-            ], 401);
+                'message' => "Pas d'événement scanné."
+            ], 404);
         }
     }
 
-    public function getStats($id)
+
+    public function getStats($agentId)
     {
         $stats = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
+            ->join('events_agents', 'events.event_id', '=', 'events_agents.events_id')
             ->join('associations', 'tickets.ticket_id', '=', 'associations.tickets_id')
-            ->where('associations.agence_id', '=', $id)
+            ->where('events_agents.agents_id', '=', $agentId)
             ->select(
                 DB::raw('COUNT(DISTINCT events.event_id) as total_evenements'),
                 DB::raw('COUNT(tickets.ticket_id) as total_tickets'),
                 DB::raw("COUNT(CASE WHEN tickets.ticket_status = 'UTILISE' THEN 1 END) as tickets_scannes")
             )
-            ->groupBy('associations.agence_id')
             ->first();
 
         if ($stats) {
@@ -210,9 +212,9 @@ class ApiAgentsController extends Controller
         } else {
             return response()->json([
                 'total_evenements' => 0,
-                'total_tickets'   => 0,
-                'tickets_scannes' => 0
-            ], 401);
+                'total_tickets'    => 0,
+                'tickets_scannes'  => 0
+            ], 200); // 200 pour éviter une erreur côté frontend
         }
     }
 
@@ -225,7 +227,7 @@ class ApiAgentsController extends Controller
 
         $messages = [
             'code.required' => 'Impossible de récupérer le code du ticket.',
-            'agent.required' => 'Veuillez vous reconnecter pour mener a bien cette opération.',
+            'agent.required' => 'Veuillez vous reconnecter pour mener à bien cette opération.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -238,43 +240,62 @@ class ApiAgentsController extends Controller
 
         $ticket = Tickets::where('ticket_code', $request->code)->first();
 
-        if ($ticket) {
-            if ($ticket->ticket_status == 'Active') {
-                $asso = Associations::where('agence_id', $request->agent)->where('tickets_id', $ticket->ticket_id)->first();
-                if ($asso) {
-
-                    $ticket->ticket_status = 'UTILISE';
-                    if ($ticket->save()) {
-                        return response()->json([
-                            'message' => "Ticket validé avec success."
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'message' => "Impossible de valider le ticket. Veuillez réessayer!!!"
-                        ], 401);
-                    }
-                } else {
-
-                    $agent = Associations::join('tickets', 'associations.tickets_id', '=', 'tickets.ticket_id')
-                        ->join('agents', 'associations.agence_id', '=', 'agents.agent_id')
-                        ->join('portes', 'associations.port_id', '=', 'portes.porte_id')
-                        ->where('tickets.ticket_code', '=', $request->code)
-                        ->select('portes.porte_name')
-                        ->first();
-
-                    return response()->json([
-                        'message' => "Le ticket n'est pas a la bonne porte. Indiquez lui la porte " . $agent,
-                    ], 401);
-                }
-            } else {
-                return response()->json([
-                    'message' => "Le ticket est déjà utilisé."
-                ], 401);
-            }
-        } else {
+        if (!$ticket) {
             return response()->json([
                 'message' => "Le ticket n'existe pas."
-            ], 401);
+            ], 404);
+        }
+
+        if ($ticket->ticket_status !== 'Active') {
+            return response()->json([
+                'message' => "Le ticket est déjà utilisé."
+            ], 400);
+        }
+
+        // Vérification si l'agent est bien lié à l'événement du ticket
+        $isLinked = EventsAgents::where('events_id', $ticket->evenment_id)
+            ->where('agents_id', $request->agent)
+            ->exists();
+
+        if (!$isLinked) {
+            return response()->json([
+                'message' => "Vous n’êtes pas autorisé à scanner ce ticket. Événement non assigné à cet agent."
+            ], 403);
+        }
+
+        // Vérification que le ticket est scanné par une porte assignée à cet agent (via Associations)
+        $association = Associations::join('portes', 'associations.port_id', '=', 'portes.porte_id')
+            ->join('events_agents', function ($join) use ($request) {
+                $join->on('portes.porte_id', '=', 'events_agents.portes_id')
+                    ->where('events_agents.agents_id', '=', $request->agent);
+            })
+            ->where('associations.tickets_id', $ticket->ticket_id)
+            ->select('portes.porte_name')
+            ->first();
+
+        if (!$association) {
+            // Le ticket est valide mais pas scanné à la bonne porte
+            $expectedPorte = Associations::join('portes', 'associations.port_id', '=', 'portes.porte_id')
+                ->where('associations.tickets_id', $ticket->ticket_id)
+                ->select('portes.porte_name')
+                ->first();
+
+            return response()->json([
+                'message' => "Le ticket n'est pas à la bonne porte. Veuillez l’orienter vers la porte : " . ($expectedPorte->porte_name ?? "inconnue") . ".",
+            ], 403);
+        }
+
+        // Tout est OK, on valide le ticket
+        $ticket->ticket_status = 'UTILISE';
+
+        if ($ticket->save()) {
+            return response()->json([
+                'message' => "Ticket validé avec succès."
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => "Impossible de valider le ticket. Veuillez réessayer."
+            ], 500);
         }
     }
 }

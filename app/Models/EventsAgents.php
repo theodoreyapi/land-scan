@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class Associations extends Model
+class EventsAgents extends Model
 {
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'tickets_id',
-        'port_id',
+        'agents_id',
+        'events_id',
+        'portes_id',
     ];
 
-    protected $table = 'associations';
+    protected $table = 'events_agents';
 
-    protected $primaryKey = 'association_id';
+    protected $primaryKey = 'event_agent_id';
 }

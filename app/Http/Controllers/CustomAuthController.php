@@ -67,6 +67,7 @@ class CustomAuthController extends Controller
                 return back()->withErrors(['Aucun tableau de bord associé à votre rôle.']);
             }
         } else {
+            Auth::logout();
             return view('auth.login');
         }
     }

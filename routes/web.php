@@ -22,12 +22,7 @@ Route::get('index', [CustomAuthController::class, 'dashboard']);
 Route::post('custom-login', [CustomAuthController::class, 'customLogin']);
 Route::get('logout', [CustomAuthController::class, 'signOut'])->name('logout');
 
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->intended('index');
-    }
-    return view('auth.login');
-});
+Route::get('/', [CustomAuthController::class, 'dashboard']);
 
 // Admin
 Route::middleware(['role:admin'])->group(function () {

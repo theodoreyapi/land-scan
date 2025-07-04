@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id('association_id');
             $table->unsignedBigInteger('tickets_id')->nullable();
             $table->foreign('tickets_id')->references('ticket_id')->on('tickets');
-            $table->unsignedBigInteger('agence_id')->nullable();
-            $table->foreign('agence_id')->references('agent_id')->on('agents');
             $table->unsignedBigInteger('port_id')->nullable();
             $table->foreign('port_id')->references('porte_id')->on('portes');
             $table->timestamps();
@@ -30,9 +28,8 @@ return new class extends Migration
     {
         Schema::dropIfExists('associations');
         Schema::table('associations', function (Blueprint $table) {
-            $table->dropForeign(['tickets_id','agence_id','port_id']);
+            $table->dropForeign(['tickets_id','port_id']);
             $table->dropColumn('tickets_id');
-            $table->dropColumn('agence_id');
             $table->dropColumn('port_id');
         });
     }

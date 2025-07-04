@@ -75,14 +75,48 @@
                 fetch(`/dashboard/event/${eventId}/stats`)
                     .then(response => response.json())
                     .then(data => {
+                        if (data.error) {
+                            alert("Erreur : " + data.message);
+                            return;
+                        }
+
                         document.getElementById('stats-zone').innerHTML = `
                         <h5>Statistiques</h5>
-                        <p><strong>Participants :</strong> ${data.stats.nbParticipants}</p>
-                        <p><strong>Observateurs :</strong> ${data.stats.nbObservateurs}</p>
-                        <div id="chart-container"></div>
+                        <ul class="list-group">
+                            <li class="list-group-item"><strong>Tickets :</strong> ${data.stats.nbTickets}</li>
+                            <li class="list-group-item"><strong>Portes :</strong> ${data.stats.nbPortes}</li>
+                            <li class="list-group-item"><strong>Stades :</strong> ${data.stats.nbStades}</li>
+                            <li class="list-group-item"><strong>Agents - Association :</strong> ${data.stats.nbAgents}</li>
+                        </ul>
+                        <div id="chart-container" style="height: 300px; margin-top: 20px;"></div>
                     `;
 
-                        Highcharts.chart('chart-container', data.chart);
+                        Highcharts.chart('chart-container', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: 'Statistiques de l’événement'
+                            },
+                            xAxis: {
+                                categories: data.chart.labels
+                            },
+                            yAxis: {
+                                title: {
+                                    text: 'Valeurs'
+                                },
+                                allowDecimals: false
+                            },
+                            series: [{
+                                name: 'Valeurs',
+                                data: data.chart.values
+                            }]
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Erreur AJAX :', error);
+                        alert("Erreur lors du chargement des statistiques.");
                     });
             });
         });
@@ -132,9 +166,10 @@
                 <h5>Événements actifs</h5>
                 <ul class="list-group" id="event-list">
                     @foreach ($events as $event)
-                        <li class="list-group-item event-item" data-id="{{ $event->id }}" style="cursor:pointer;">
+                        <li class="list-group-item event-item" data-id="{{ $event->event_id }}" style="cursor:pointer;">
                             <h5>{{ $event->event_name }}</h5>
-                            <small>{{ $event->event_date }} à {{ $event->event_time }}</small>
+                            <small>{{ $event->event_date }} à {{ $event->event_time }} - {{ $event->event_date_fin }} à
+                                {{ $event->event_time_fin }}</small>
                         </li>
                         <br>
                     @endforeach

@@ -121,15 +121,13 @@
                                     </td>
                                     <td>
                                         <div class="action-icon d-inline-flex">
-                                            <a href="{{ route('associations.show', $asso->agent_id) }}" class="me-2"><i
-                                                    class="ti ti-edit"></i>
-                                            </a>
-                                            {{-- <a href="#" data-bs-toggle="modal"
+
+                                            <a href="#" data-bs-toggle="modal"
                                                 data-bs-target="#delete_modal{{ $asso->agent_id }}"><i
                                                     class="ti ti-trash"></i>
-                                            </a> --}}
+                                            </a>
                                         </div>
-                                        {{-- <div class="modal fade" id="delete_modal{{ $asso->agent_id }}">
+                                        <div class="modal fade" id="delete_modal{{ $asso->agent_id }}">
                                             <div class="modal-dialog modal-dialog-centered modal-sm">
                                                 <form action="{{ route('associations.destroy', $asso->agent_id) }}"
                                                     method="POST">
@@ -159,7 +157,7 @@
                                                 </form>
                                             </div>
                                         </div>
-                                    </td> --}}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
