@@ -57,8 +57,7 @@
                                     @csrf
                                     <div class="vh-100 d-flex flex-column justify-content-between p-4 pb-0">
                                         <div class=" mx-auto mb-5 text-center">
-                                            <img src="{{ URL::asset('') }}assets/img/logo.svg" class="img-fluid"
-                                                alt="Logo">
+                                            <h4>LAND SCAN</h4>
                                         </div>
                                         <div class="">
                                             <div class="text-center mb-3">
