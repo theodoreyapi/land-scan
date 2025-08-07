@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Imports\TicketImport;
+use App\Models\Associations;
 use App\Models\Events;
+use App\Models\Portes;
 use App\Models\Tickets;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,11 +25,12 @@ class TicketsController extends Controller
         }
 
         $events = Events::where('event_status', '=', 'Active')->get();
+        $portes = Portes::where('porte_status', '=', 'Active')->get();
         $all = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
             ->select('tickets.*', 'events.event_name')
             ->get();
 
-        return view('events.tickets', compact('all', 'events'));
+        return view('events.tickets', compact('all', 'events', 'portes'));
     }
 
     /**
@@ -62,13 +65,15 @@ class TicketsController extends Controller
                 // Pour toute autre erreur (ex: fichier corrompu, mauvaise extension...)
                 Log::error('Erreur lors de l\'importation : ' . $e->getMessage());
 
-                return back()->withErrors(['Une erreur est survenue lors de l\'importation.'. $e->getMessage()]);
+                return back()->withErrors(['Une erreur est survenue lors de l\'importation.' . $e->getMessage()]);
             }
         } else {
             $roles = [
                 'code' => 'required|unique:tickets,ticket_code',
                 'st' => 'required',
                 'free' => 'required',
+                'porte' => 'required',
+                'event' => 'required',
                 'seas' => '',
                 'passed' => '',
             ];
@@ -77,6 +82,8 @@ class TicketsController extends Controller
                 'code.unique' => $request->code . " existe déjà. Veuillez essayer un autre code.",
                 'st.required' => "Veuillez saisir le ST du ticket.",
                 'free.required' => "Veuillez saisir free du ticket.",
+                'porte.required' => "Veuillez selectionner la porte du ticket.",
+                'event.required' => "Veuillez selectionner l'evenement du ticket.",
             ];
 
             $request->validate($roles, $customMessages);
@@ -89,6 +96,12 @@ class TicketsController extends Controller
             $ticket->ticket_passed = $request->passed;
             $ticket->evenment_id = $request->event;
             if ($ticket->save()) {
+
+                Associations::create([
+                    'tickets_id' => $ticket->ticket_id,
+                    'port_id'    => $request->porte,
+                ]);
+
                 return back()->with('succes',  "Vous avez ajouter " . $request->code);
             } else {
                 return back()->withErrors(["Impossible d'ajouter " . $request->code . ". Veuillez réessayer!!"]);
@@ -122,12 +135,14 @@ class TicketsController extends Controller
         $roles = [
             'st' => 'required',
             'free' => 'required',
+            'event' => 'required',
             'seas' => '',
             'passed' => '',
         ];
         $customMessages = [
             'st.required' => "Veuillez sélectionner le statut du département.",
             'free.required' => "Veuillez sélectionner le département.",
+            'event.required' => "Veuillez selectionner l'evenement du ticket.",
         ];
 
         $request->validate($roles, $customMessages);

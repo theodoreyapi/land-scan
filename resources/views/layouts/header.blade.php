@@ -2,12 +2,12 @@
  <div class="header" style="background: #B5C0D0">
      <div class="main-header">
 
-         <div class="header-left">
+         <div class="header-left" style="align-content: center;">
              <a href="#" class="logo">
-                 <img src="{{ URL::asset('') }}assets/img/logo.svg" alt="Logo">
+                 <h4>LAND SCAN</h4>
              </a>
              <a href="#" class="dark-logo">
-                 <img src="{{ URL::asset('') }}assets/img/logo-white.svg" alt="Logo">
+                 <h4>LAND SCAN</h4>
              </a>
          </div>
 
@@ -53,8 +53,8 @@
                                              alt="img">
                                      </span>
                                      <div>
-                                         <h5 class="mb-0">{{ Auth::user()->name ?? "" }}</h5>
-                                         <p class="fs-12 fw-medium mb-0">{{ Auth::user()->phone ?? "" }}</p>
+                                         <h5 class="mb-0">{{ Auth::user()->name ?? '' }}</h5>
+                                         <p class="fs-12 fw-medium mb-0">{{ Auth::user()->phone ?? '' }}</p>
                                      </div>
                                  </div>
                              </div>

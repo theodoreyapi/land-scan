@@ -87,6 +87,19 @@
                             <li class="list-group-item"><strong>Portes :</strong> ${data.stats.nbPortes}</li>
                             <li class="list-group-item"><strong>Stades :</strong> ${data.stats.nbStades}</li>
                             <li class="list-group-item"><strong>Agents - Association :</strong> ${data.stats.nbAgents}</li>
+                            <li class="list-group-item"><strong>Total Tickets Validés :</strong> ${data.stats.totalTicketsValides}</li>
+                        </ul>
+
+                        <h6 class="mt-4">Tickets validés par agent</h6>
+                        <ul class="list-group">
+                            ${
+                                data.stats.ticketsParAgent.length > 0
+                                    ? data.stats.ticketsParAgent.map(agent =>
+                                        `<li class="list-group-item">
+                                                ${agent.agent_name} : ${agent.tickets_valides} tickets validés
+                                            </li>`).join('')
+                                    : '<li class="list-group-item">Aucun ticket validé par un agent.</li>'
+                            }
                         </ul>
                         <div id="chart-container" style="height: 300px; margin-top: 20px;"></div>
                     `;

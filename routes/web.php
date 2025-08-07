@@ -77,6 +77,7 @@ Route::get('add-associate', function () {
     $portes = Portes::all();
     return view('events.add-associate', compact('events', 'agents', 'portes'));
 });
+Route::post('dissocier/{id}', [AssociationsController::class, 'dissocier']);
 Route::resource('departments', EvenementsController::class);
 Route::get('/tickets/event/{id}', [TicketsController::class, 'getByEvent']);
 Route::resource('designations', TicketsController::class);

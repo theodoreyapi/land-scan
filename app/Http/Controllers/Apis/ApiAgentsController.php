@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Apis;
 use App\Http\Controllers\Controller;
 use App\Models\Agents;
 use App\Models\Associations;
+use App\Models\Events;
 use App\Models\EventsAgents;
 use App\Models\Tickets;
 use Illuminate\Http\Request;
@@ -89,7 +90,6 @@ class ApiAgentsController extends Controller
             'message' => "Agent non trouvé."
         ], 404);
     }
-
 
     public function getEventFive($agentId)
     {
@@ -193,7 +193,6 @@ class ApiAgentsController extends Controller
         }
     }
 
-
     public function getStats($agentId)
     {
         $stats = Tickets::join('events', 'tickets.evenment_id', '=', 'events.event_id')
@@ -236,6 +235,26 @@ class ApiAgentsController extends Controller
             return response()->json([
                 'message' => $validator->errors(),
             ], 422);
+        }
+
+        $agents = Agents::where('agent_id', '=', $request->agent)
+            ->where('agent_status', '=', 'Active')
+            ->first();
+
+        if (!$agents) {
+            return response()->json([
+                'message' => "Votre compte est désactivé. Vous ne pouvez pas scanner un ticket. Veuillez contacter l'administrateur."
+            ], 404);
+        }
+
+        $verifEvent = Events::join('tickets', 'events.event_id', '=', 'tickets.evenment_id')
+            ->where('tickets.', '=', $request->code)
+            ->first();
+
+        if (!$verifEvent) {
+            return response()->json([
+                'message' => "L'evenement n'est plus disponible. Vous ne pouvez pas valider ce ticket"
+            ], 404);
         }
 
         $ticket = Tickets::where('ticket_code', $request->code)->first();

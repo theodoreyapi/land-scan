@@ -171,7 +171,8 @@
                                                                                 *</span></label>
                                                                         <br>
                                                                         <select name="event" required class="select">
-                                                                            <option value="{{ $tickets->evenment_id }}">Sélectionne</option>
+                                                                            <option value="{{ $tickets->evenment_id }}">
+                                                                                Sélectionne</option>
                                                                             @foreach ($events as $item)
                                                                                 <option value="{{ $item->event_id }}">
                                                                                     {{ $item->event_name }}</option>
@@ -184,7 +185,8 @@
                                                                         <label class="form-label">Code <span
                                                                                 class="text-danger">
                                                                                 *</span></label>
-                                                                        <input disabled type="text" required value="{{ $tickets->ticket_code }}"
+                                                                        <input disabled type="text" required
+                                                                            value="{{ $tickets->ticket_code }}"
                                                                             class="form-control">
                                                                     </div>
                                                                 </div>
@@ -193,7 +195,8 @@
                                                                         <label class="form-label">St.<span
                                                                                 class="text-danger">
                                                                                 *</span></label>
-                                                                        <input type="text" name="st" required value="{{ $tickets->ticket_st }}"
+                                                                        <input type="text" name="st" required
+                                                                            value="{{ $tickets->ticket_st }}"
                                                                             class="form-control">
                                                                     </div>
                                                                 </div>
@@ -202,21 +205,24 @@
                                                                         <label class="form-label">Free <span
                                                                                 class="text-danger">
                                                                                 *</span></label>
-                                                                        <input type="text" required name="free" value="{{ $tickets->ticket_free }}"
+                                                                        <input type="text" required name="free"
+                                                                            value="{{ $tickets->ticket_free }}"
                                                                             class="form-control">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="mb-3">
                                                                         <label class="form-label">Seas. </label>
-                                                                        <input type="text" name="seas" value="{{ $tickets->ticket_seas }}"
+                                                                        <input type="text" name="seas"
+                                                                            value="{{ $tickets->ticket_seas }}"
                                                                             class="form-control">
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="mb-3">
                                                                         <label class="form-label">Passed </label>
-                                                                        <input type="text" name="passed" value="{{ $tickets->ticket_passed }}"
+                                                                        <input type="text" name="passed"
+                                                                            value="{{ $tickets->ticket_passed }}"
                                                                             class="form-control">
                                                                     </div>
                                                                 </div>
@@ -316,6 +322,18 @@
                                         <option value="">Sélectionne</option>
                                         @foreach ($events as $item)
                                             <option value="{{ $item->event_id }}">{{ $item->event_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Porte <span class="text-danger">
+                                            *</span></label>
+                                    <select name="porte" required class="select">
+                                        <option value="">Sélectionne</option>
+                                        @foreach ($portes as $port)
+                                            <option value="{{ $port->porte_id }}">{{ $port->porte_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agents;
 use App\Models\Associations;
+use App\Models\Events;
 use App\Models\EventsAgents;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,12 +21,14 @@ class AssociationsController extends Controller
             return view('auth.login');
         }
 
+        $events = Events::where('event_status', '=', 'Active')->get();
+
         $all = Agents::select(
             'agents.*',
             DB::raw('(SELECT COUNT(*) FROM events_agents WHERE events_agents.agents_id = agents.agent_id) AS total')
         )->get();
 
-        return view('events.associations', compact('all'));
+        return view('events.associations', compact('all', 'events'));
     }
 
     /**
@@ -93,5 +96,14 @@ class AssociationsController extends Controller
         EventsAgents::where('agents_id', $id)->delete();
 
         return back()->with('succes', "La suppression a été effectué");
+    }
+
+    public function dissocier(Request $request, $id)
+    {
+        EventsAgents::where('agents_id', $id)
+            ->where('events_id', $request->event)
+            ->delete();
+
+        return back()->with('succes', "La dissociation a été effectué");
     }
 }

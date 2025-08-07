@@ -103,7 +103,7 @@
                         <thead class="thead-light">
                             <tr>
                                 <th>Agent</th>
-                                <th>Ticket attribué</th>
+                                <th>Evenement associe</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -121,40 +121,52 @@
                                     </td>
                                     <td>
                                         <div class="action-icon d-inline-flex">
-
                                             <a href="#" data-bs-toggle="modal"
-                                                data-bs-target="#delete_modal{{ $asso->agent_id }}"><i
+                                                data-bs-target="#agent_dissocier{{ $asso->agent_id }}"><i
                                                     class="ti ti-trash"></i>
                                             </a>
                                         </div>
-                                        <div class="modal fade" id="delete_modal{{ $asso->agent_id }}">
-                                            <div class="modal-dialog modal-dialog-centered modal-sm">
-                                                <form action="{{ route('associations.destroy', $asso->agent_id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <div class="modal-content">
-                                                        <div class="modal-body text-center">
-                                                            <span
-                                                                class="avatar avatar-xl bg-transparent-danger text-danger mb-3">
-                                                                <i class="ti ti-trash-x fs-36"></i>
-                                                            </span>
-                                                            <h4 class="mb-1">Confirmer la suppression</h4>
-                                                            <br>
-                                                            <div class="alert alert-warning alert-dismissible fade show">
-                                                                <strong>Cette opération ne peut pas être annulée une
-                                                                    fois supprimée.</strong>
-                                                            </div>
-                                                            <div class="d-flex justify-content-center">
-                                                                <a href="javascript:void(0);" class="btn btn-light me-3"
-                                                                    data-bs-dismiss="modal">Annuler</a>
-                                                                <button type="submit" class="btn btn-danger">
-                                                                    Oui, Supprimer
-                                                                </button>
+                                        <div class="modal fade" id="agent_dissocier{{ $asso->agent_id }}">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-danger">
+                                                        <div class="d-flex align-items-center">
+                                                            <h4 class="modal-title me-2 text-white">Dissociation</h4>
+                                                        </div>
+                                                        <button type="button" class="btn-close custom-btn-close"
+                                                            data-bs-dismiss="modal" aria-label="Close">
+                                                            <i class="ti ti-x"></i>
+                                                        </button>
+                                                    </div>
+                                                    <form action="{{ url('dissocier', $asso->agent_id) }}" method="POST" role="form">
+                                                        @csrf
+                                                        <div class="modal-body pb-0 ">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Évènement <span
+                                                                                class="text-danger">
+                                                                                *</span></label>
+                                                                        <br>
+                                                                        <select name="event" required class="select">
+                                                                            <option value="">Sélectionne l'événement a
+                                                                                dissocier</option>
+                                                                            @foreach ($events as $item)
+                                                                                <option value="{{ $item->event_id }}">
+                                                                                    {{ $item->event_name }}</option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </form>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-light border me-2"
+                                                                data-bs-dismiss="modal">Annuler</button>
+                                                            <button type="submit" class="btn btn-danger">Dissocier</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
