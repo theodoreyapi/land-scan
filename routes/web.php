@@ -37,9 +37,9 @@ Route::middleware(['role:observateur'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('observateur.dashboard');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard/event/{id}/stats', [AdminController::class, 'eventStats'])->name('dashboard.event.stats');
-});
+//Route::middleware(['auth'])->group(function () {
+Route::get('/dashboard/event/{id}/stats', [AdminController::class, 'eventStats'])->name('dashboard.event.stats');
+//});
 
 
 // Create admin
