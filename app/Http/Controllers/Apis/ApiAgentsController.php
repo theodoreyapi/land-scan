@@ -100,6 +100,7 @@ class ApiAgentsController extends Controller
             ->where('events_agents.agents_id', '=', $agentId)
             ->where('tickets.ticket_status', '=', 'Active')
             ->select(
+                'tickets.ticket_id',
                 'events.event_id',
                 'events.event_image',
                 'events.event_name',
@@ -109,6 +110,7 @@ class ApiAgentsController extends Controller
                 'portes.porte_name',
                 'tickets.ticket_status'
             )
+            ->distinct() // On évite les doublons dès la requête
             ->get();
 
         // Regroupement par événement
@@ -117,7 +119,11 @@ class ApiAgentsController extends Controller
         $events = $grouped->map(function ($items, $eventId) {
             $first = $items->first();
 
+            // Liste des portes uniques
             $portes = $items->pluck('porte_name')->unique()->values();
+
+            // Comptage des tickets uniques
+            $uniqueTickets = $items->pluck('ticket_id')->unique();
 
             return [
                 'event_id'         => $eventId,
@@ -129,8 +135,8 @@ class ApiAgentsController extends Controller
                 'event_date'       => $first->event_date,
                 'event_time'       => $first->event_time,
                 'portes'           => $portes, // Tableau de portes
-                'total_tickets'    => $items->count(),
-                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->count(),
+                'total_tickets'    => $uniqueTickets->count(),
+                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->pluck('ticket_id')->unique()->count(),
             ];
         })->values();
 
@@ -152,6 +158,7 @@ class ApiAgentsController extends Controller
             ->where('events_agents.agents_id', '=', $agentId)
             ->where('tickets.ticket_status', '=', 'UTILISE')
             ->select(
+                'tickets.ticket_id',
                 'events.event_id',
                 'events.event_image',
                 'events.event_name',
@@ -161,6 +168,7 @@ class ApiAgentsController extends Controller
                 'portes.porte_name',
                 'tickets.ticket_status'
             )
+            ->distinct() // On évite les doublons dès la requête
             ->get();
 
         // Regroupement par événement
@@ -168,6 +176,12 @@ class ApiAgentsController extends Controller
 
         $events = $grouped->map(function ($items, $eventId) {
             $first = $items->first();
+
+            // Liste des portes uniques
+            $portes = $items->pluck('porte_name')->unique()->values();
+
+            // Comptage des tickets uniques
+            $uniqueTickets = $items->pluck('ticket_id')->unique();
 
             return [
                 'event_id'         => $eventId,
@@ -178,9 +192,9 @@ class ApiAgentsController extends Controller
                 'event_lieu'       => $first->event_lieu,
                 'event_date'       => $first->event_date,
                 'event_time'       => $first->event_time,
-                'portes'           => $items->pluck('porte_name')->unique()->values(),
-                'total_tickets'    => $items->count(),
-                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->count(),
+                'portes'           => $portes, // Tableau de portes
+                'total_tickets'    => $uniqueTickets->count(),
+                'tickets_scannes'  => $items->where('ticket_status', 'UTILISE')->pluck('ticket_id')->unique()->count(),
             ];
         })->values();
 
@@ -188,7 +202,7 @@ class ApiAgentsController extends Controller
             return response()->json($events, 200);
         } else {
             return response()->json([
-                'message' => "Pas d'événement scanné."
+                'message' => "Pas d'événement scanne."
             ], 404);
         }
     }
@@ -248,7 +262,7 @@ class ApiAgentsController extends Controller
         }
 
         $verifEvent = Events::join('tickets', 'events.event_id', '=', 'tickets.evenment_id')
-            ->where('tickets.', '=', $request->code)
+            ->where('tickets.ticket_code', '=', $request->code)
             ->first();
 
         if (!$verifEvent) {
