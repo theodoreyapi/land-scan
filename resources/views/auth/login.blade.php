@@ -57,7 +57,7 @@
                                     @csrf
                                     <div class="vh-100 d-flex flex-column justify-content-between p-4 pb-0">
                                         <div class=" mx-auto mb-5 text-center">
-                                            <h4>LAND SCAN</h4>
+                                            <h4>ONS billetterie</h4>
                                         </div>
                                         <div class="">
                                             <div class="text-center mb-3">

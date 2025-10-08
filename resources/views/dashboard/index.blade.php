@@ -96,8 +96,8 @@
                                 data.stats.ticketsParAgent.length > 0
                                     ? data.stats.ticketsParAgent.map(agent =>
                                         `<li class="list-group-item">
-                                                    ${agent.agent_name} : ${agent.tickets_valides} tickets validés
-                                                </li>`).join('')
+                                                        ${agent.agent_name} : ${agent.tickets_valides} tickets validés
+                                                    </li>`).join('')
                                     : '<li class="list-group-item">Aucun ticket validé par un agent.</li>'
                             }
                         </ul>

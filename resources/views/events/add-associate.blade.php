@@ -190,7 +190,7 @@
             }
 
             .ticket-card.active {
-                border-color: #4E81EE;
+                border-color: #1077b1;
                 /* Bleu Bootstrap */
             }
 

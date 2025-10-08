@@ -1,13 +1,13 @@
  <!-- Header -->
- <div class="header" style="background: #B5C0D0">
+ <div class="header" style="background: #199e5f">
      <div class="main-header">
 
          <div class="header-left" style="align-content: center;">
              <a href="#" class="logo">
-                 <h4>LAND SCAN</h4>
+                 <h4 style="color: white"> <img src="{{ URL::asset('assets/img/ons.png') }}" alt="" style="height: 25px"> ONS billetterie</h4>
              </a>
              <a href="#" class="dark-logo">
-                 <h4>LAND SCAN</h4>
+                 <h4 style="color: white"><img src="{{ URL::asset('assets/img/ons.png') }}" alt="" style="height: 25px"> ONS billetterie</h4>
              </a>
          </div>
 

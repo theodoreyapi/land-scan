@@ -100,7 +100,7 @@ $(function() {
 })
 
 $(".ticket-chart-1").peity("bar", {
-    fill: ["#4E81EE"],
+    fill: ["#1077b1"],
     width: '100%',
     height: '70'
 })

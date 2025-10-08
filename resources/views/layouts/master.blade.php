@@ -42,7 +42,7 @@
 
 </head>
 
-<body class="data-layout-transparent">
+<body class="bg-white">
 
     <div id="global-loader">
         <div class="page-loader"></div>
